@@ -1,0 +1,19 @@
+version: "3.9"
+
+networks:
+  microservices_networks:
+    external: true
+
+services:
+  nginx:
+    container_name: api-gateway
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "80:80"
+    networks:
+      - microservices_networks

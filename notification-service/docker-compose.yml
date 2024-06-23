@@ -1,0 +1,48 @@
+version: "3.9"
+
+networks:
+  notification_service_networks:
+    driver: bridge
+  microservices_networks:
+    external: true
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: notification-service
+    restart: always
+    ports:
+      - "${SERVICE_PORT}:${SERVICE_PORT}"
+    env_file:
+      - .env
+    environment:
+      - SERVICE_PORT=${SERVICE_PORT}
+      - EMAIL=${EMAIL}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+      - MONGO_USERNAME=${MONGO_USERNAME}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_DATABASE=${MONGO_DATABASE}
+      - MONGO_PORT=${MONGO_PORT}
+      - MONGO_HOST=${MONGO_HOST}
+      - ACCESS_KEY=${ACCESS_KEY}
+      - REFRESH_KEY=${REFRESH_KEY}
+    networks:
+      - notification_service_networks
+      - microservices_networks
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:latest
+    container_name: notification-db
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
+    volumes:
+      - ./database/mongodb/:/data/db
+    networks:
+      - notification_service_networks

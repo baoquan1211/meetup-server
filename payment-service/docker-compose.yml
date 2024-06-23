@@ -1,0 +1,27 @@
+version: "3.9"
+
+networks:
+  payment_service_networks:
+    driver: bridge
+  microservices_networks:
+    external: true
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: payment-service
+    restart: always
+    networks:
+      - payment_service_networks
+      - microservices_networks
+
+  # redis-stack:
+  #   image: redis/redis-stack:latest
+  #   container_name: payment-redis
+  #   restart: always
+  #   volumes:
+  #     - ./database/redis-stack/:/data
+  #     - ./database/redis-stack/redis.conf:/usr/local/etc/redis/redis.conf
+  #   command: ["redis-server", "--protected-mode", "no"]

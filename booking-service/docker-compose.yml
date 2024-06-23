@@ -1,0 +1,65 @@
+version: "3.9"
+
+networks:
+  booking_service_networks:
+    driver: bridge
+  microservices_networks:
+    external: true
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: booking-service
+    restart: always
+    ports:
+      - "${SERVICE_PORT}:${SERVICE_PORT}"
+    env_file:
+      - .env
+    environment:
+      - SERVICE_PORT=${SERVICE_PORT}
+      - MONGO_USERNAME=${MONGO_USERNAME}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_DATABASE=${MONGO_DATABASE}
+      - MONGO_HOST=${MONGO_HOST}
+      - MONGO_PORT=${MONGO_PORT}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_HOST=${REDIS_HOST}
+      - ACCESS_KEY=${ACCESS_KEY}
+      - REFRESH_KEY=${REFRESH_KEY}
+    networks:
+      - booking_service_networks
+      - microservices_networks
+    depends_on:
+      - mongo
+      - redis-stack
+
+  mongo:
+    image: mongo:latest
+    container_name: booking-db
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
+    volumes:
+      - ./database/mongodb/:/data/db
+    networks:
+      - booking_service_networks
+
+  redis-stack:
+    image: redis/redis-stack:latest
+    container_name: booking-redis
+    restart: always
+    volumes:
+      - ./database/redis-stack/:/data
+      - ./database/redis-stack/redis.conf:/usr/local/etc/redis/redis.conf
+    env_file:
+      - .env
+    networks:
+      - booking_service_networks
+    command: ["redis-server", "--protected-mode", "no"]
+
+volumes:
+  mongo:

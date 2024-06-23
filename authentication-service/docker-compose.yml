@@ -1,0 +1,76 @@
+version: "3.9"
+
+networks:
+  authentication_service_networks:
+    driver: bridge
+  microservices_networks:
+    external: true
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: authentication-service
+    restart: always
+    ports:
+      - "${SERVICE_PORT}:${SERVICE_PORT}"
+    env_file:
+      - .env
+    environment:
+      - SERVICE_PORT=${SERVICE_PORT}
+      - EMAIL=${EMAIL}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+      - MONGO_USERNAME=${MONGO_USERNAME}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_DATABASE=${MONGO_DATABASE}
+      - MONGO_PORT=${MONGO_PORT}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_INSIGHT_PORT=${REDIS_INSIGHT_PORT}
+      - ACCESS_KEY=${ACCESS_KEY}
+      - REFRESH_KEY=${REFRESH_KEY}
+    networks:
+      - authentication_service_networks
+      - microservices_networks
+    depends_on:
+      - mongo
+      - redis-stack
+
+  mongo:
+    image: mongo:latest
+    container_name: auth-user-db
+    restart: always
+    env_file:
+      - .env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
+    volumes:
+      - ./database/mongodb/:/data/db
+    networks:
+      - authentication_service_networks
+
+    ports:
+      - "${MONGO_PORT}:27017"
+
+  redis-stack:
+    image: redis/redis-stack:latest
+    container_name: auth-redis
+    restart: always
+    volumes:
+      - ./database/redis-stack/:/data
+      - ./database/redis-stack/redis.conf:/usr/local/etc/redis/redis.conf
+    env_file:
+      - .env
+    ports:
+      - "${REDIS_PORT}:6379"
+      - "${REDIS_INSIGHT_PORT}:8001"
+    command: ["redis-server", "--protected-mode", "no"]
+    networks:
+      - authentication_service_networks
+      - microservices_networks
+
+volumes:
+  mongodb:
+  redis-stack:

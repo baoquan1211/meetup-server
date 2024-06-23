@@ -5,6 +5,19 @@ const clientRedis = require("./databases/redis");
 const run = require("./helper/kafka_consumer");
 // App
 const app = express();
+
+const allowCrossDomain = (req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+
+  next();
+};
+
+app.use(allowCrossDomain);
 // Middleware
 app.use(morgan("dev"));
 app.use(helmet());
@@ -22,6 +35,7 @@ app.use((req, res, next) => {
   error.status = 404;
   next(error);
 });
+
 app.use((err, req, res, next) => {
   const statusError = err.status || 500;
   const messageError = err.message || "Internal Server Error";
@@ -30,5 +44,6 @@ app.use((err, req, res, next) => {
     message: messageError,
   });
 });
+
 // Export
 module.exports = app;

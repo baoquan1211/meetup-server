@@ -2,20 +2,13 @@ import useLogout from "@/hooks/auth/useLogout";
 import axios, { AxiosResponse } from "axios";
 
 const instance = axios.create({
-  baseURL: `${
-    Boolean(import.meta.env.VITE_DEBUG) == true
-      ? import.meta.env.VITE_SERVER_URL
-      : window.location.origin
-  }/api/v1`,
-  headers: {
-    "Access-Control-Allow-Origin": "*",
-  },
+  baseURL: import.meta.env.VITE_SERVER_URL,
 });
 
 instance.interceptors.request.use(
   function (config) {
     const accessToken = localStorage.getItem("access_token");
-    config.headers.Authorization = "Bearer " + accessToken;
+    config.headers.Authorization = accessToken;
     return config;
   },
   function (error) {
@@ -53,7 +46,7 @@ instance.interceptors.response.use(
     // Do something with response data
 
     const res = {
-      data: response.data.data,
+      data: response.data.metadata ?? response.data.data,
       status: response.status,
       statusText: "success",
     } as AxiosResponse<SuccessResponse<unknown>>;
@@ -76,7 +69,7 @@ instance.interceptors.response.use(
 
     const _response: ErrorResponse = new ErrorResponseImpl(
       response.status,
-      response.data.detail
+      response.data.message
     );
     return Promise.reject(_response);
   }

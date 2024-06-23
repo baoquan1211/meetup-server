@@ -8,9 +8,12 @@ type EventCardProps = {
 
 function EventCard({ event }: EventCardProps) {
   return (
-    <Link to="#" className="flex flex-row md:flex-col group">
+    <Link
+      to={`/events/${event.id}`}
+      className="flex flex-row md:flex-col group"
+    >
       <img
-        src="public/png/event.webp"
+        src="/png/event.webp"
         alt="event"
         className="max-w-[272px] rounded-md"
       />
@@ -20,7 +23,7 @@ function EventCard({ event }: EventCardProps) {
         </h2>
         <div className="flex gap-2">
           <Calendar />
-          {" Fri Jun 21 2024 11:30:00"}
+          {event?.start_date?.toString()}
         </div>
         <div className="flex gap-4 text-slate-600 items-center">
           <div className="flex gap-1 items-center">

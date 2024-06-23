@@ -17,7 +17,7 @@ function Slogan() {
           Events are happening every day—sign up to join the fun.
         </p>
         <div>
-          <Link className="inline-block hover:no-underline" to="/register">
+          <Link className="inline-block hover:no-underline" to="/sign-up">
             <Button className="bg-secondary hover:bg-secondary/90">
               Join Meetup
             </Button>

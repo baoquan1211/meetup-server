@@ -2,12 +2,13 @@ import { authSignal } from "@/auth/signals";
 import { Token } from "@/models/auth";
 
 function useAuth() {
-  return ({ token, email }: { token: Token; email: string }) => {
+  return ({ token }: { token: Token }) => {
+    console.log(token);
     authSignal.value.accessToken.value = token.access_token;
-    authSignal.value.email.value = email;
+    authSignal.value.refreshToken.value = token.refresh_token;
 
     localStorage.setItem("access_token", token.access_token);
-    localStorage.setItem("email", email);
+    localStorage.setItem("refresh_token", token.refresh_token);
   };
 }
 

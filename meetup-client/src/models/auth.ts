@@ -6,11 +6,12 @@ export type Token = {
 
 export type User = {
   id: string;
-  phone: string;
+  phone?: string;
   role: string;
   first_name: string;
   last_name: string;
-  address: {
+  isActive: boolean;
+  address?: {
     city: string;
     street: string;
     country: string;

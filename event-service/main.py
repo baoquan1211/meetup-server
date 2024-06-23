@@ -2,21 +2,26 @@
 from fastapi import FastAPI
 import uvicorn
 from core import settings
-from core.database.mysql import Base,Engine
-from api.router import ManageRouter,UserRouter
+from core.database.mysql import Base, Engine
+from api.router import ManageRouter, UserRouter
 from api.auth.middleware import ExceptionHandlerMiddleware
 from core.kafka import KafkaConsumer
 import asyncio
+from fastapi.middleware.cors import CORSMiddleware
+
+
 # Lifespan
-async def lifespan(app:FastAPI):
+async def lifespan(app: FastAPI):
     Consumer = KafkaConsumer(
         KAFKA_BOOTSTRAP_SERVERS=settings.KAFKA_BOOTSTRAP_SERVERS,
-        TOPIC=["update_profile","booking","payment_return"]
+        TOPIC=["update_profile", "booking", "payment_return"],
     )
     await Consumer.connect()
     asyncio.create_task(Consumer.run())
     yield
-    await Consumer.close() 
+    await Consumer.close()
+
+
 # App
 app = FastAPI(
     title=settings.APP_TITLE,
@@ -26,16 +31,23 @@ app = FastAPI(
     docs_url="/",
     lifespan=lifespan,
 )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # Database
 Base.metadata.create_all(Engine)
 # Router
 app.include_router(
-    router = ManageRouter,
-    prefix = "/manage",
+    router=ManageRouter,
+    prefix="/manage",
 )
 app.include_router(
-    router = UserRouter,
-    prefix = "",
+    router=UserRouter,
+    prefix="",
 )
 # Handle Error
 app.add_middleware(ExceptionHandlerMiddleware)

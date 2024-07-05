@@ -1,29 +1,42 @@
 from fastapi import FastAPI
 import uvicorn
-from core import KAFKA_BOOTSTRAP_SERVERS,APP_DEBUG,APP_PORT,APP_TITLE,APP_VERSION,MINIO_ACCESS_KEY,MINIO_SECRET_KEY,MINIO_PORT
-from core.database.mysql import Base,Engine
-from api.router import ManageRouter,UserRouter
+from core import (
+    KAFKA_BOOTSTRAP_SERVERS,
+    APP_DEBUG,
+    APP_PORT,
+    APP_TITLE,
+    APP_VERSION,
+    MINIO_ACCESS_KEY,
+    MINIO_SECRET_KEY,
+    MINIO_PORT,
+)
+from core.database.mysql import Base, Engine
+from api.router import ManageRouter, UserRouter
 from api.auth.middleware import ExceptionHandlerMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from core.kafka import KafkaConsumer
 from core.minio import MinIO
 import asyncio
+
+
 # Lifespan
-async def lifespan(app:FastAPI):
+async def lifespan(app: FastAPI):
     Consumer = KafkaConsumer(
         KAFKA_BOOTSTRAP_SERVERS=KAFKA_BOOTSTRAP_SERVERS,
-        TOPIC=["update_profile","booking","payment_return"]
+        TOPIC=["update_profile", "booking", "payment_return"],
     )
     await Consumer.connect()
     MinIO(
         access_key=MINIO_ACCESS_KEY,
         secret_key=MINIO_SECRET_KEY,
         port=MINIO_PORT,
-        buckets=['image']
+        buckets=["image"],
     )
-    asyncio.create_task(Consumer.run())    
+    asyncio.create_task(Consumer.run())
     yield
-    await Consumer.close() 
+    await Consumer.close()
+
+
 # App
 app = FastAPI(
     title=APP_TITLE,
@@ -36,18 +49,21 @@ app = FastAPI(
 # CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=['*']
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 # Database
 Base.metadata.create_all(Engine)
 # Router
 app.include_router(
-    router = ManageRouter,
-    prefix = "/manage",
+    router=ManageRouter,
+    prefix="/manage",
 )
 app.include_router(
-    router = UserRouter,
-    prefix = "",
+    router=UserRouter,
+    prefix="",
 )
 # Handle Error
 app.add_middleware(ExceptionHandlerMiddleware)

@@ -1,6 +1,6 @@
 require("dotenv").config();
 // App
-PORT = process.env.PORT || 5051;
+PORT = process.env.SERVICE_PORT || 5051;
 // Mongo
 MONGO_HOST = process.env.MONGO_HOST || "127.0.0.1";
 MONGO_PORT = +process.env.MONGO_PORT || 27017;

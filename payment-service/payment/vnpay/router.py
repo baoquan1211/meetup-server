@@ -18,7 +18,7 @@ VNPayRouter = APIRouter(
 def create_booking(request:Request,payment:PaymentForm):
     # check order_id
     order_id = payment.booking_id
-    response = requests.get(f'http://booking-service/api/v1/booking/{order_id}',headers={
+    response = requests.get(f'http://booking-service:5050/api/v1/booking/{order_id}',headers={
         "Authorization":request.headers.get("Authorization")
     })
     

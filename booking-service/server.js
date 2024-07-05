@@ -1,12 +1,17 @@
-const { server, io } = require("./src/app");
-const { SERVICE_PORT } = require("./src/settings");
+const { server } = require("./src/app");
+const colors = require("colors");
+const { PORT } = require("./src/settings");
+const consumer = require("./src/ultis/kafka_consumer");
 
-server.listen(SERVICE_PORT, () => {
-  console.info(`Application listening on ${SERVICE_PORT}`);
+colors.enable();
+server.listen(PORT, () => {
+  console.log(colors.green(`INFO:     `), `Application listening on ${PORT}`);
 });
 
-process.on("SIGINT", () => {
-  console.info("Application stopped");
+process.on("SIGINT", async () => {
+  await consumer.disconnect();
+  console.log(colors.green(`INFO:     `), "Application stopped");
+  console.info();
   server.close();
   process.exit(0);
 });

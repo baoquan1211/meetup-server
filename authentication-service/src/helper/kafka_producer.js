@@ -1,12 +1,14 @@
-const { Kafka } = require("kafkajs");
-
+const { Kafka, Partitioners } = require("kafkajs");
+const { KAFKA_HOST, KAFKA_PORT } = require("../config");
 class KafkaProducer {
   constructor({ clientId, brokers }) {
     this.kafka = new Kafka({
       clientId,
       brokers,
     });
-    this.producer = this.kafka.producer();
+    this.producer = this.kafka.producer({
+      createPartitioner: Partitioners.LegacyPartitioner,
+    });
   }
   async connect() {
     await this.producer.connect();
@@ -24,7 +26,7 @@ class KafkaProducer {
 }
 const producer = new KafkaProducer({
   clientId: "my-app",
-  brokers: ["kafka:9092"],
+  brokers: [`${KAFKA_HOST}:${KAFKA_PORT}`],
 });
 producer.connect();
 module.exports = producer;

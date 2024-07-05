@@ -1,4 +1,4 @@
-const UserService = require("../service/user.services");
+const UserService = require("./user.services");
 const JWTFactory = require("../helper/jwt_service");
 const blacklistModel = require("../model/blacklist.model");
 const bcrypt = require("bcrypt");

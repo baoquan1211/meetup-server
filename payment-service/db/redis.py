@@ -35,4 +35,4 @@ class Redis:
         return self._client
 
 
-RedisSesion = Redis(port=6379)
+RedisSesion = Redis(port=8100)

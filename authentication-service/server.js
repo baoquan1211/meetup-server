@@ -1,13 +1,16 @@
-const app = require("./src/app");
-
-const PORT = process.env.SERVICE_PORT || 5001;
-
-const server = app.listen(PORT, () => {
-  console.log(`INFO:   Application listening on ${PORT}`);
+const { app } = require("./src/app");
+const colors = require("colors");
+const { SERVICE_PORT } = require("./src/config");
+colors.enable();
+const server = app.listen(SERVICE_PORT, () => {
+  console.log(
+    colors.green("INFO:    "),
+    `Application listening on ${SERVICE_PORT}`
+  );
 });
 
 process.on("SIGINT", () => {
-  console.log("INFO:   Application stopped");
+  console.log(colors.green("INFO:    "), `Application stopped`);
   server.close();
   process.exit(0);
 });

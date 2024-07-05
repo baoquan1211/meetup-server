@@ -9,6 +9,10 @@ const RoleEnum = {
   ADMIN: "Admin",
 };
 var userSchema = new mongoose.Schema({
+  avatar: {
+    type: String,
+    default: "http://authentication-service/api/v1/avatar/default.png",
+  },
   email: {
     type: String,
     required: true,

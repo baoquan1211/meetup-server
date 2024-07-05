@@ -28,6 +28,8 @@ services:
       - REDIS_HOST=${REDIS_HOST}
       - ACCESS_KEY=${ACCESS_KEY}
       - REFRESH_KEY=${REFRESH_KEY}
+      - KAFKA_HOST=${KAFKA_HOST}
+      - KAFKA_PORT=${KAFKA_PORT}
     networks:
       - booking_service_networks
       - microservices_networks

@@ -25,10 +25,15 @@ services:
       - MONGO_PASSWORD=${MONGO_PASSWORD}
       - MONGO_DATABASE=${MONGO_DATABASE}
       - MONGO_PORT=${MONGO_PORT}
+      - MONGO_HOST=${MONGO_HOST}
       - REDIS_PORT=${REDIS_PORT}
-      - REDIS_INSIGHT_PORT=${REDIS_INSIGHT_PORT}
+      - REDIS_HOST=${REDIS_HOST}
       - ACCESS_KEY=${ACCESS_KEY}
       - REFRESH_KEY=${REFRESH_KEY}
+      - KAFKA_HOST=${KAFKA_HOST}
+      - KAFKA_PORT=${KAFKA_PORT}
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
     networks:
       - authentication_service_networks
       - microservices_networks
@@ -70,6 +75,22 @@ services:
     networks:
       - authentication_service_networks
       - microservices_networks
+
+  minio:
+    image: minio/minio
+    container_name: minio
+    restart: always
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - ./minio:/data
+    environment:
+      MINIO_ROOT_USER: root
+      MINIO_ROOT_PASSWORD: rootMINIO
+    command: server --console-address ":9001" /data
+    networks:
+      - authentication_service_networks
 
 volumes:
   mongodb:

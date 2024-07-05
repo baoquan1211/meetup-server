@@ -22,6 +22,10 @@ services:
       - ACCESS_KEY=${ACCESS_KEY}
       - REFRESH_KEY=${REFRESH_KEY}
       - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS}
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - MINIO_PORT=${MINIO_PORT}
+      - MYSQL_USERNAME=${MYSQL_USERNAME}
     networks:
       - event-service_networks
       - microservices_networks
@@ -60,3 +64,17 @@ services:
     networks:
       - event-service_networks
     command: ["redis-server", "--protected-mode", "no"]
+
+  minio:
+    image: minio/minio
+    container_name: minio_event
+    restart: always
+    ports:
+      - "9002:9000"
+      - "9003:9001"
+    volumes:
+      - ./minio:/data
+    environment:
+      MINIO_ROOT_USER: root
+      MINIO_ROOT_PASSWORD: rootMINIO
+    command: server --console-address ":9001" /data

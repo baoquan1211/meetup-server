@@ -1,24 +1,33 @@
 const mongoose = require("mongoose");
-const mongo = require("../../config/").mongo;
-const debug = require("../../config").app.debug;
-const connectString = `mongodb://${mongo.username}:${mongo.password}@${mongo.host}:${mongo.port}`;
+const colors = require("colors");
+const {
+  MONGO_USERNAME,
+  MONGO_PASSWORD,
+  MONGO_HOST,
+  MONGO_PORT,
+  MONGO_DATABASE,
+} = require("../../config");
+const { DEBUG } = require("../../config");
+const connectString = `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}`;
 class Database {
   constructor() {
     this.connect();
   }
   connect() {
-    if (debug) {
-      mongoose.set("debug", true);
-      mongoose.set("debug", { color: true });
-    }
     mongoose
       .connect(connectString, {
-        dbName: mongo.database,
+        dbName: MONGO_DATABASE,
       })
       .then((_) => {
-        console.log("INFO:   Connected to MongoDB");
+        console.log(colors.green("INFO:    "), "Connected to MongoDB");
       })
-      .catch((error) => console.log(`Error:  ${error}!`));
+      .catch((error) => {
+        console.log(colors.red("ERROR:    "), `${error}`);
+        setTimeout(() => {
+          console.log(colors.yellow("INFO:    "), "Reconnect to MongoDB");
+          this.connect();
+        }, 30000); //
+      });
   }
   //
   static getInstance() {
